@@ -149,23 +149,33 @@
        DRAW
     ====================== */
 
-    async function drawSanta() {
-      const { data, error } = await supabase.rpc("draw_secret_santa");
+    <script>
+  async function drawSanta() {
+    const drawBtn = document.querySelector("button[onclick='drawSanta()']");
+    drawBtn.disabled = true;
+    drawBtn.innerText = "🎄 Drawing...";
 
-      if (error) {
-        alert(error.message);
-        return;
-      }
+    const { data, error } = await supabase.rpc("draw_secret_santa");
 
-      const { data: receiver } = await supabase
-        .from("profiles")
-        .select("display_name")
-        .eq("id", data)
-        .single();
-
-      result.innerText = "🎁 You are gifting: " + receiver.display_name;
+    if (error) {
+      alert(error.message);
+      drawBtn.disabled = false;
+      drawBtn.innerText = "🎁 Draw My Secret Santa";
+      return;
     }
-  </script>
 
+    const { data: receiver } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", data)
+      .single();
+
+    // Festive result
+    document.getElementById("result").innerText =
+      "🎁 You are gifting: " + receiver.display_name;
+
+    drawBtn.innerText = "🎅 Santa has decided";
+  }
+</script>
 </body>
 </html>
