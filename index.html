@@ -137,17 +137,37 @@
     ====================== */
 
     async function loadProfile() {
-      const { data } = await supabase
-        .from("profiles")
-        .select("display_name")
+     <script>
+  async function loadProfile() {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("display_name, has_drawn")
+      .single();
+
+    username.innerText = profile.display_name;
+
+    if (profile.has_drawn) {
+      const { data: assignment } = await supabase
+        .from("assignments")
+        .select("receiver")
         .single();
 
-      username.innerText = data.display_name;
-    }
+      const { data: receiver } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", assignment.receiver)
+        .single();
 
-    /* =====================
-       DRAW
-    ====================== */
+      result.innerText =
+        "🎁 You are gifting: " + receiver.display_name;
+
+      document.querySelector("button[onclick='drawSanta()']").disabled = true;
+      document.querySelector("button[onclick='drawSanta()']").innerText =
+        "🎅 Already drawn";
+    }
+  }
+</script>
+    }
 
     <script>
   async function drawSanta() {
