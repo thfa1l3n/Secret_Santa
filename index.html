@@ -6,6 +6,16 @@
     <title>JingleDraw</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js">
+    <script>
+  const SUPABASE_URL = "https://waovikmteeywbmagwgjl.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhb3Zpa210ZWV5d2JtYWd3Z2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4ODUwNDYsImV4cCI6MjA4MTQ2MTA0Nn0.jy_v6zdF6mzIirO53pD-AmhP8MvFrwm_fRr7P0vf0ek";
+
+  const supabase = supabaseJs.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+</script>
+
     <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
