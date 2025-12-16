@@ -1,112 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JingleDraw</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js">
-    <script>
-  const SUPABASE_URL = "https://waovikmteeywbmagwgjl.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhb3Zpa210ZWV5d2JtYWd3Z2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4ODUwNDYsImV4cCI6MjA4MTQ2MTA0Nn0.jy_v6zdF6mzIirO53pD-AmhP8MvFrwm_fRr7P0vf0ek";
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JingleDraw 🎄</title>
 
-  const supabase = supabaseJs.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-</script>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              christmas: ['"Mountains of Christmas"', 'cursive'],
-              body: ['"Fredoka"', 'sans-serif'],
-            },
-            colors: {
-              santa: {
-                red: '#D42426',
-                dark: '#8B0000',
-              },
-              pine: {
-                DEFAULT: '#2F5233',
-                light: '#4C8255',
-              },
-              gold: {
-                DEFAULT: '#FFD700',
-                sparkle: '#FBF579',
-              },
-              snow: '#F0F8FF',
-            },
-            animation: {
-              'spin-slow': 'spin 3s linear infinite',
-              'wiggle': 'wiggle 1s ease-in-out infinite',
-              'sway': 'sway 3s ease-in-out infinite alternate',
-              'bounce-wild': 'bounceWild 0.5s infinite',
-              'pop-in': 'popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-              'snow-fall': 'fall 10s linear infinite',
-            },
-            keyframes: {
-              wiggle: {
-                '0%, 100%': { transform: 'rotate(-3deg)' },
-                '50%': { transform: 'rotate(3deg)' },
-              },
-              sway: {
-                '0%': { transform: 'rotate(-5deg)' },
-                '100%': { transform: 'rotate(5deg)' },
-              },
-              bounceWild: {
-                '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-10px)' },
-              },
-              popIn: {
-                '0%': { opacity: '0', transform: 'scale(0.5)' },
-                '100%': { opacity: '1', transform: 'scale(1)' },
-              },
-              fall: {
-                '0%': { transform: 'translateY(-10vh)' },
-                '100%': { transform: 'translateY(110vh)' },
-              }
-            }
-          },
-        },
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            christmas: ['"Mountains of Christmas"', 'cursive'],
+            body: ['"Fredoka"', 'sans-serif'],
+          }
+        }
       }
-    </script>
-    <style>
-      body {
-        background-color: #8B0000;
-        overflow-x: hidden;
-      }
-      .pattern-stripes {
-        background-image: repeating-linear-gradient(
-          45deg,
-          transparent,
-          transparent 20px,
-          rgba(255, 255, 255, 0.1) 20px,
-          rgba(255, 255, 255, 0.1) 40px
-        );
-      }
-      .text-shadow-glow {
-        text-shadow: 0 0 10px #FFD700, 2px 2px 0px #000;
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
-    "canvas-confetti": "https://esm.sh/canvas-confetti@^1.9.4"
-  }
-}
-</script>
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #8B0000;
+    }
+  </style>
 </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+<body class="font-body text-white flex items-center justify-center min-h-screen">
+
+  <!-- AUTH -->
+  <div id="auth" class="bg-red-900 p-6 rounded-xl shadow-xl w-80">
+    <h1 class="font-christmas text-3xl mb-4 text-center">🎄 JingleDraw 🎁</h1>
+
+    <input id="email" class="w-full p-2 mb-2 text-black rounded" placeholder="Email">
+    <input id="password" type="password" class="w-full p-2 mb-2 text-black rounded" placeholder="Password">
+    <input id="name" class="w-full p-2 mb-4 text-black rounded" placeholder="Display Name">
+
+    <button onclick="signUp()" class="w-full bg-green-600 p-2 rounded mb-2">Sign Up</button>
+    <button onclick="login()" class="w-full bg-yellow-500 p-2 rounded text-black">Login</button>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="hidden bg-red-900 p-6 rounded-xl shadow-xl w-80 text-center">
+    <h2 class="font-christmas text-2xl mb-4">Ho Ho Ho, <span id="username"></span> 🎅</h2>
+    <button onclick="drawSanta()" class="bg-green-600 p-3 rounded w-full mb-4">
+      🎁 Draw My Secret Santa
+    </button>
+    <p id="result" class="mb-4"></p>
+    <button onclick="logout()" class="text-sm underline">Logout</button>
+  </div>
+
+  <script>
+    /* =====================
+       SUPABASE SETUP
+    ====================== */
+
+    const SUPABASE_URL = "https://waovikmteeywbmagwgjl.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhb3Zpa210ZWV5d2JtYWd3Z2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4ODUwNDYsImV4cCI6MjA4MTQ2MTA0Nn0.jy_v6zdF6mzIirO53pD-AmhP8MvFrwm_fRr7P0vf0ek";
+    const GROUP_ID = "bb36db04-e6dc-44bf-aa21-f1c10e95f210";
+
+    const supabase = supabaseJs.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    /* =====================
+       AUTH FUNCTIONS
+    ====================== */
+
+    async function signUp() {
+      const email = emailEl.value;
+      const password = passwordEl.value;
+      const name = nameEl.value;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await supabase.from("profiles").insert({
+        id: data.user.id,
+        display_name: name,
+        group_id: GROUP_ID
+      });
+
+      alert("Signup successful. Please login.");
+    }
+
+    async function login() {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: emailEl.value,
+        password: passwordEl.value
+      });
+
+      if (error) alert(error.message);
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+    }
+
+    /* =====================
+       SESSION HANDLING
+    ====================== */
+
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
+    const nameEl = document.getElementById("name");
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        auth.style.display = "none";
+        app.style.display = "block";
+        loadProfile();
+      } else {
+        auth.style.display = "block";
+        app.style.display = "none";
+      }
+    });
+
+    /* =====================
+       LOAD PROFILE
+    ====================== */
+
+    async function loadProfile() {
+      const { data } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .single();
+
+      username.innerText = data.display_name;
+    }
+
+    /* =====================
+       DRAW
+    ====================== */
+
+    async function drawSanta() {
+      const { data, error } = await supabase.rpc("draw_secret_santa");
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      const { data: receiver } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", data)
+        .single();
+
+      result.innerText = "🎁 You are gifting: " + receiver.display_name;
+    }
+  </script>
+
+</body>
 </html>
