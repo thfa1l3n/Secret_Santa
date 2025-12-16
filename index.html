@@ -50,52 +50,60 @@
 
   <!-- APP -->
   <div id="app" class="hidden bg-red-900 p-6 rounded-xl shadow-xl w-80 text-center">
-    <h2 class="font-christmas text-2xl mb-4">Ho Ho Ho, <span id="username"></span> 🎅</h2>
-    <button onclick="drawSanta()" class="bg-green-600 p-3 rounded w-full mb-4">
+    <h2 class="font-christmas text-2xl mb-4">
+      Ho Ho Ho, <span id="username"></span> 🎅
+    </h2>
+
+    <button id="drawBtn" onclick="drawSanta()" class="bg-green-600 p-3 rounded w-full mb-4">
       🎁 Draw My Secret Santa
     </button>
+
     <p id="result" class="mb-4"></p>
     <button onclick="logout()" class="text-sm underline">Logout</button>
   </div>
 
   <script>
-    /* =====================
-       SUPABASE SETUP
-    ====================== */
-
     const SUPABASE_URL = "https://waovikmteeywbmagwgjl.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indhb3Zpa210ZWV5d2JtYWd3Z2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4ODUwNDYsImV4cCI6MjA4MTQ2MTA0Nn0.jy_v6zdF6mzIirO53pD-AmhP8MvFrwm_fRr7P0vf0ek";
     const GROUP_ID = "bb36db04-e6dc-44bf-aa21-f1c10e95f210";
 
-    const supabase = supabaseJs.createClient(
+    const supabase = supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY
     );
 
-    /* =====================
-       AUTH FUNCTIONS
-    ====================== */
+    const authDiv = document.getElementById("auth");
+    const appDiv = document.getElementById("app");
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
+    const nameEl = document.getElementById("name");
+    const usernameEl = document.getElementById("username");
+    const resultEl = document.getElementById("result");
+    const drawBtn = document.getElementById("drawBtn");
 
     async function signUp() {
-      const email = emailEl.value;
-      const password = passwordEl.value;
-      const name = nameEl.value;
-
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password
+        email: emailEl.value,
+        password: passwordEl.value
       });
 
-      if (error) {
-        alert(error.message);
+      if (error || !data.user) {
+        alert(error?.message || "Signup failed");
         return;
       }
 
-      await supabase.from("profiles").insert({
-        id: data.user.id,
-        display_name: name,
-        group_id: GROUP_ID
-      });
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: data.user.id,
+          display_name: nameEl.value,
+          group_id: GROUP_ID
+        });
+
+      if (profileError) {
+        alert(profileError.message);
+        return;
+      }
 
       alert("Signup successful. Please login.");
     }
@@ -113,89 +121,66 @@
       await supabase.auth.signOut();
     }
 
-    /* =====================
-       SESSION HANDLING
-    ====================== */
-
-    const emailEl = document.getElementById("email");
-    const passwordEl = document.getElementById("password");
-    const nameEl = document.getElementById("name");
-
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
-        auth.style.display = "none";
-        app.style.display = "block";
-        loadProfile();
+        authDiv.style.display = "none";
+        appDiv.style.display = "block";
+        await loadProfile();
       } else {
-        auth.style.display = "block";
-        app.style.display = "none";
+        authDiv.style.display = "block";
+        appDiv.style.display = "none";
       }
     });
 
-    /* =====================
-       LOAD PROFILE
-    ====================== */
-
     async function loadProfile() {
-     <script>
-  async function loadProfile() {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("display_name, has_drawn")
-      .single();
-
-    username.innerText = profile.display_name;
-
-    if (profile.has_drawn) {
-      const { data: assignment } = await supabase
-        .from("assignments")
-        .select("receiver")
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name, has_drawn")
         .single();
+
+      usernameEl.innerText = profile.display_name;
+
+      if (profile.has_drawn) {
+        const { data: assignment } = await supabase
+          .from("assignments")
+          .select("receiver")
+          .single();
+
+        const { data: receiver } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", assignment.receiver)
+          .single();
+
+        resultEl.innerText = "🎁 You are gifting: " + receiver.display_name;
+        drawBtn.disabled = true;
+        drawBtn.innerText = "🎅 Already drawn";
+      }
+    }
+
+    async function drawSanta() {
+      drawBtn.disabled = true;
+      drawBtn.innerText = "🎄 Drawing...";
+
+      const { data, error } = await supabase.rpc("draw_secret_santa");
+
+      if (error) {
+        alert(error.message);
+        drawBtn.disabled = false;
+        drawBtn.innerText = "🎁 Draw My Secret Santa";
+        return;
+      }
 
       const { data: receiver } = await supabase
         .from("profiles")
         .select("display_name")
-        .eq("id", assignment.receiver)
+        .eq("id", data)
         .single();
 
-      result.innerText =
-        "🎁 You are gifting: " + receiver.display_name;
-
-      document.querySelector("button[onclick='drawSanta()']").disabled = true;
-      document.querySelector("button[onclick='drawSanta()']").innerText =
-        "🎅 Already drawn";
+      resultEl.innerText = "🎁 You are gifting: " + receiver.display_name;
+      drawBtn.innerText = "🎅 Santa has decided";
     }
-  }
-</script>
-    }
+  </script>
 
-    <script>
-  async function drawSanta() {
-    const drawBtn = document.querySelector("button[onclick='drawSanta()']");
-    drawBtn.disabled = true;
-    drawBtn.innerText = "🎄 Drawing...";
-
-    const { data, error } = await supabase.rpc("draw_secret_santa");
-
-    if (error) {
-      alert(error.message);
-      drawBtn.disabled = false;
-      drawBtn.innerText = "🎁 Draw My Secret Santa";
-      return;
-    }
-
-    const { data: receiver } = await supabase
-      .from("profiles")
-      .select("display_name")
-      .eq("id", data)
-      .single();
-
-    // Festive result
-    document.getElementById("result").innerText =
-      "🎁 You are gifting: " + receiver.display_name;
-
-    drawBtn.innerText = "🎅 Santa has decided";
-  }
-</script>
 </body>
 </html>
